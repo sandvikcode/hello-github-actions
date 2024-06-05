@@ -9,7 +9,9 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
+    permissions:
+      contents: read
+      packages: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -18,17 +20,15 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '11'
-        distribution: 'adopt'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        distribution: 'temurin'
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
     - name: Publish to GitHub Packages
-      run: mvn deploy
+      run: mvn --batch-mode deploy
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_USER }}
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
